@@ -9,13 +9,28 @@ import { connect } from 'react-redux';
 
 import actions from '../../actions';
 
+import { CloseIcon, BagIcon } from '../../components/Common/Icon';
+import Button from '../../components/Common/Button';
 import CartList from '../../components/Store/CartList';
 import CartSummary from '../../components/Store/CartSummary';
 import Checkout from '../../components/Store/Checkout';
-import { BagIcon, CloseIcon } from '../../components/Common/Icon';
-import Button from '../../components/Common/Button';
+import { trackCartViewed } from '../../utils/rudderstack';
 
 class Cart extends React.PureComponent {
+  componentDidMount() {
+    // Track cart viewed when cart is opened
+    if (this.props.isCartOpen && this.props.cartItems.length > 0) {
+      trackCartViewed(this.props.cartItems);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    // Track cart viewed when cart is opened
+    if (!prevProps.isCartOpen && this.props.isCartOpen && this.props.cartItems.length > 0) {
+      trackCartViewed(this.props.cartItems);
+    }
+  }
+
   render() {
     const {
       isCartOpen,

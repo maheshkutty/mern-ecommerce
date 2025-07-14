@@ -13,8 +13,14 @@ import actions from '../../actions';
 import banners from './banners.json';
 import CarouselSlider from '../../components/Common/CarouselSlider';
 import { responsiveOneItemCarousel } from '../../components/Common/CarouselSlider/utils';
+import { trackPageView } from '../../utils/rudderstack';
 
 class Homepage extends React.PureComponent {
+  componentDidMount() {
+    // Track page view
+    trackPageView('Homepage');
+  }
+
   render() {
     return (
       <div className='homepage'>

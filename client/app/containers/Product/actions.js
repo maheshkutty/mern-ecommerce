@@ -4,7 +4,7 @@
  *
  */
 
-import { goBack } from 'connected-react-router';
+import { push, goBack } from 'connected-react-router';
 import { success } from 'react-notification-system-redux';
 import axios from 'axios';
 
@@ -18,19 +18,27 @@ import {
   PRODUCT_SHOP_CHANGE,
   SET_PRODUCT_FORM_ERRORS,
   SET_PRODUCT_FORM_EDIT_ERRORS,
+  SET_PRODUCT_SHOP_FORM_ERRORS,
   RESET_PRODUCT,
+  RESET_PRODUCT_SHOP,
   ADD_PRODUCT,
   REMOVE_PRODUCT,
   FETCH_PRODUCTS_SELECT,
   SET_PRODUCTS_LOADING,
-  SET_ADVANCED_FILTERS,
-  RESET_ADVANCED_FILTERS
+  SET_ADVANCED_FILTERS
 } from './constants';
 
-import { API_URL, ROLES } from '../../constants';
+import { toggleCart } from '../Navigation/actions';
 import handleError from '../../utils/error';
 import { formatSelectOptions, unformatSelectOptions } from '../../utils/select';
 import { allFieldsValidation } from '../../utils/validation';
+import { API_URL } from '../../constants';
+// Add RudderStack tracking imports
+import {
+  trackProductViewed,
+  trackProductListViewed,
+  trackProductSearched
+} from '../../utils/rudderstack';
 
 export const productChange = (name, value) => {
   let formData = {};
@@ -103,6 +111,21 @@ export const filterProducts = (n, v) => {
         payload: products
       });
 
+      // Track product list viewed
+      let listName = '';
+      if (n === 'category') {
+        listName = `Category: ${v}`;
+      } else if (n === 'brand') {
+        listName = `Brand: ${v}`;
+      } else if (payload.name) {
+        listName = `Search: ${payload.name}`;
+        trackProductSearched(payload.name);
+      }
+      
+      if (products && products.length > 0) {
+        trackProductListViewed(products, listName);
+      }
+
       const newPayload = {
         ...payload,
         totalPages,
@@ -136,6 +159,9 @@ export const fetchStoreProduct = slug => {
         type: FETCH_STORE_PRODUCT,
         payload: product
       });
+
+      // Track product viewed
+      trackProductViewed(product);
     } catch (error) {
       handleError(error, dispatch);
     } finally {

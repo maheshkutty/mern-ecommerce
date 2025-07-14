@@ -22,6 +22,7 @@ import {
 import handleError from '../../utils/error';
 import { allFieldsValidation, santizeFields } from '../../utils/validation';
 import { API_URL } from '../../constants';
+import { trackProductReviewed } from '../../utils/rudderstack';
 
 export const reviewChange = (name, value) => {
   let formData = {};
@@ -185,6 +186,9 @@ export const addProductReview = () => {
       if (response.data.success === true) {
         dispatch(success(successfulOptions));
         dispatch(fetchProductReviews(product.slug));
+        
+        // Track product reviewed
+        trackProductReviewed(product, review.rating, review.review);
 
         // dispatch({
         //   type: ADD_REVIEW,

@@ -17,8 +17,14 @@ import Button from '../../components/Common/Button';
 import Checkbox from '../../components/Common/Checkbox';
 import LoadingIndicator from '../../components/Common/LoadingIndicator';
 import SignupProvider from '../../components/Common/SignupProvider';
+import { trackPageView } from '../../utils/rudderstack';
 
 class Signup extends React.PureComponent {
+  componentDidMount() {
+    // Track page view
+    trackPageView('Signup Page');
+  }
+
   render() {
     const {
       authenticated,

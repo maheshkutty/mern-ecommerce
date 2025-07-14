@@ -23,6 +23,7 @@ class List extends React.PureComponent {
 
   render() {
     const { history, brands, isLoading, user } = this.props;
+    rudderanalytics.page('Brand List');
 
     return (
       <>

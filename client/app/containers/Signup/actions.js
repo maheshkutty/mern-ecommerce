@@ -21,6 +21,7 @@ import setToken from '../../utils/token';
 import handleError from '../../utils/error';
 import { allFieldsValidation } from '../../utils/validation';
 import { API_URL } from '../../constants';
+import { identifyUser, trackSignup } from '../../utils/rudderstack';
 
 export const signupChange = (name, value) => {
   let formData = {};
@@ -84,7 +85,18 @@ export const signUp = () => {
 
       dispatch(setAuth());
       dispatch(success(successfulOptions));
+      
+      // Track user signup and identify user
+      trackSignup(response.data.user);
+      identifyUser(response.data.user);
+      
       dispatch({ type: SIGNUP_RESET });
+      trackSignup({
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        isSubscribed
+      });
     } catch (error) {
       const title = `Please try to signup again!`;
       handleError(error, dispatch, title);

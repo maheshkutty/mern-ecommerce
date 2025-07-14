@@ -10,6 +10,7 @@ import axios from 'axios';
 import { FETCH_WISHLIST, SET_WISHLIST_LOADING } from './constants';
 import handleError from '../../utils/error';
 import { API_URL } from '../../constants';
+import { trackWishlistProductAdded, trackWishlistProductRemoved } from '../../utils/rudderstack';
 
 export const updateWishlist = (isLiked, productId) => {
   return async (dispatch, getState) => {
@@ -29,6 +30,15 @@ export const updateWishlist = (isLiked, productId) => {
         if (response.data.success === true) {
           dispatch(success(successfulOptions));
           dispatch(fetchWishlist());
+          
+          // Track wishlist events
+          // Note: We need to get product details for full tracking
+          const productData = { _id: productId };
+          if (isLiked) {
+            trackWishlistProductAdded(productData);
+          } else {
+            trackWishlistProductRemoved(productData);
+          }
         }
       } else {
         const retryOptions = {

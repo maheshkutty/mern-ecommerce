@@ -22,6 +22,7 @@ import { clearCart } from '../Cart/actions';
 import { clearAccount } from '../Account/actions';
 import { allFieldsValidation } from '../../utils/validation';
 import { API_URL } from '../../constants';
+import { identifyUser, trackLogin, trackLogout } from '../../utils/rudderstack';
 
 export const loginChange = (name, value) => {
   let formData = {};
@@ -73,6 +74,10 @@ export const login = () => {
 
       dispatch(setAuth());
       dispatch(success(successfulOptions));
+      
+      // Track user login and identify user
+      trackLogin(response.data.user);
+      identifyUser(response.data.user);
 
       dispatch({ type: LOGIN_RESET });
     } catch (error) {
@@ -92,6 +97,9 @@ export const signOut = () => {
       position: 'tr',
       autoDismiss: 1
     };
+
+    // Track user logout
+    trackLogout();
 
     dispatch(clearAuth());
     dispatch(clearAccount());

@@ -21,10 +21,14 @@ import Page404 from '../../components/Common/Page404';
 import ProductFilter from '../../components/Store/ProductFilter';
 import Pagination from '../../components/Common/Pagination';
 import SelectOption from '../../components/Common/SelectOption';
+import { trackPageView } from '../../utils/rudderstack';
 
 class Shop extends React.PureComponent {
   componentDidMount() {
     document.body.classList.add('shop-page');
+
+    // Track page view
+    trackPageView('Shop Page');
   }
 
   componentWillUnmount() {

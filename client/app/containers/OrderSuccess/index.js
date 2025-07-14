@@ -13,17 +13,24 @@ import actions from '../../actions';
 
 import NotFound from '../../components/Common/NotFound';
 import LoadingIndicator from '../../components/Common/LoadingIndicator';
+import { trackPageView } from '../../utils/rudderstack';
 
 class OrderSuccess extends React.PureComponent {
   componentDidMount() {
     const id = this.props.match.params.id;
     this.props.fetchOrder(id);
+
+    // Track page view
+    trackPageView('Order Success', { order_id: id });
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.match.params.id !== prevProps.match.params.id) {
       const id = this.props.match.params.id;
       this.props.fetchOrder(id);
+
+      // Track page view for new order
+      trackPageView('Order Success', { order_id: id });
     }
   }
 

@@ -12,17 +12,24 @@ import actions from '../../actions';
 import ProductList from '../../components/Store/ProductList';
 import NotFound from '../../components/Common/NotFound';
 import LoadingIndicator from '../../components/Common/LoadingIndicator';
+import { trackPageView } from '../../utils/rudderstack';
 
 class CategoryShop extends React.PureComponent {
   componentDidMount() {
     const slug = this.props.match.params.slug;
     this.props.filterProducts('category', slug);
+
+    // Track page view
+    trackPageView('Category Shop', { category: slug });
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.match.params.slug !== prevProps.match.params.slug) {
       const slug = this.props.match.params.slug;
       this.props.filterProducts('category', slug);
+
+      // Track page view for new category
+      trackPageView('Category Shop', { category: slug });
     }
   }
 

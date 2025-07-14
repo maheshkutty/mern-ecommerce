@@ -26,6 +26,13 @@ import { API_URL, CART_ID, CART_ITEMS, CART_TOTAL } from '../../constants';
 import handleError from '../../utils/error';
 import { allFieldsValidation } from '../../utils/validation';
 import { toggleCart } from '../Navigation/actions';
+// Add RudderStack tracking imports
+import { 
+  trackProductAddedToCart, 
+  trackProductRemovedFromCart, 
+  trackCartViewed,
+  trackCheckoutStarted 
+} from '../../utils/rudderstack';
 
 // Handle Add To Cart
 export const handleAddToCart = product => {
@@ -68,6 +75,9 @@ export const handleAddToCart = product => {
     }
     localStorage.setItem(CART_ITEMS, JSON.stringify(newCartItems));
 
+    // Track product added to cart
+    trackProductAddedToCart(product);
+
     dispatch(calculateCartTotal());
     dispatch(toggleCart());
   };
@@ -84,6 +94,10 @@ export const handleRemoveFromCart = product => {
       type: REMOVE_FROM_CART,
       payload: product
     });
+    
+    // Track product removed from cart
+    trackProductRemovedFromCart(product);
+    
     dispatch(calculateCartTotal());
     // dispatch(toggleCart());
   };
@@ -134,6 +148,11 @@ export const handleCheckout = () => {
       position: 'tr',
       autoDismiss: 1
     };
+
+    // Track checkout started
+    const cartItems = getState().cart.cartItems;
+    const cartTotal = getState().cart.cartTotal;
+    trackCheckoutStarted(cartItems, cartTotal);
 
     dispatch(toggleCart());
     dispatch(push('/login'));

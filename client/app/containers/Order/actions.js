@@ -22,6 +22,7 @@ import { clearCart, getCartId } from '../Cart/actions';
 import { toggleCart } from '../Navigation/actions';
 import handleError from '../../utils/error';
 import { API_URL } from '../../constants';
+import { trackOrderCompleted, trackOrderCancelled } from '../../utils/rudderstack';
 
 export const updateOrderStatus = value => {
   return {
@@ -154,6 +155,9 @@ export const cancelOrder = () => {
 
       await axios.delete(`${API_URL}/order/cancel/${order._id}`);
 
+      // Track order cancelled
+      trackOrderCancelled(order);
+
       dispatch(push(`/dashboard/orders`));
     } catch (error) {
       handleError(error, dispatch);
@@ -200,12 +204,21 @@ export const addOrder = () => {
     try {
       const cartId = localStorage.getItem('cart_id');
       const total = getState().cart.cartTotal;
+      const cartItems = getState().cart.cartItems;
 
       if (cartId) {
         const response = await axios.post(`${API_URL}/order/add`, {
           cartId,
           total
         });
+
+        // Track order completed
+        const orderData = {
+          _id: response.data.order._id,
+          total: total,
+          products: cartItems
+        };
+        trackOrderCompleted(orderData);
 
         dispatch(push(`/order/success/${response.data.order._id}`));
         dispatch(clearCart());

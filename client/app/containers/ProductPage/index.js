@@ -18,6 +18,7 @@ import NotFound from '../../components/Common/NotFound';
 import { BagIcon } from '../../components/Common/Icon';
 import ProductReviews from '../../components/Store/ProductReviews';
 import SocialShare from '../../components/Store/SocialShare';
+import { trackPageView } from '../../utils/rudderstack';
 
 class ProductPage extends React.PureComponent {
   componentDidMount() {
@@ -25,12 +26,18 @@ class ProductPage extends React.PureComponent {
     this.props.fetchStoreProduct(slug);
     this.props.fetchProductReviews(slug);
     document.body.classList.add('product-page');
+
+    // Track page view
+    trackPageView('Product Page', { product_slug: slug });
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.match.params.slug !== prevProps.match.params.slug) {
       const slug = this.props.match.params.slug;
       this.props.fetchStoreProduct(slug);
+
+      // Track page view for new product
+      trackPageView('Product Page', { product_slug: slug });
     }
   }
 
